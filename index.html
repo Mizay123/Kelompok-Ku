@@ -1,0 +1,613 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pembagian Kelompok Otomatis</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #4361ee;
+            --secondary-color: #3a0ca3;
+            --accent-color: #f72585;
+            --light-color: #f8f9fa;
+            --dark-color: #212529;
+            --success-color: #4cc9f0;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7ff;
+            color: var(--dark-color);
+            line-height: 1.6;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.2rem;
+        }
+        
+        .description {
+            color: #666;
+            font-size: 1.1rem;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+        }
+        
+        @media (min-width: 992px) {
+            .main-content {
+                flex-direction: row;
+            }
+            
+            .input-section {
+                flex: 1;
+            }
+            
+            .output-section {
+                flex: 2;
+            }
+        }
+        
+        .card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 25px;
+            margin-bottom: 20px;
+        }
+        
+        .card-title {
+            color: var(--secondary-color);
+            margin-bottom: 20px;
+            font-size: 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        textarea, select, input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+        
+        textarea:focus, select:focus, input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+        }
+        
+        textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+        
+        .counter {
+            text-align: right;
+            font-size: 0.9rem;
+            color: #777;
+            margin-top: 5px;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .btn:hover {
+            background-color: var(--secondary-color);
+            transform: translateY(-2px);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-success {
+            background-color: var(--success-color);
+        }
+        
+        .btn-success:hover {
+            background-color: #2aa0c2;
+        }
+        
+        .btn-danger {
+            background-color: var(--accent-color);
+        }
+        
+        .btn-danger:hover {
+            background-color: #d1146a;
+        }
+        
+        .buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .error-message {
+            color: #e63946;
+            background-color: #ffccd5;
+            padding: 10px 15px;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+            display: none;
+        }
+        
+        .result-container {
+            display: none;
+        }
+        
+        .result-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .result-title {
+            color: var(--secondary-color);
+            font-size: 1.5rem;
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .groups-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
+        }
+        
+        .group-card {
+            background-color: white;
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 20px;
+            border-top: 4px solid var(--primary-color);
+        }
+        
+        .group-title {
+            color: var(--primary-color);
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #ddd;
+        }
+        
+        .member-list {
+            list-style-type: none;
+        }
+        
+        .member-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .member-list li:last-child {
+            border-bottom: none;
+        }
+        
+        .member-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #666;
+        }
+        
+        .empty-state i {
+            font-size: 3rem;
+            color: #ddd;
+            margin-bottom: 15px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        .instructions {
+            background-color: #e7f3ff;
+            border-left: 4px solid var(--primary-color);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 var(--border-radius) var(--border-radius) 0;
+        }
+        
+        .instructions h3 {
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .instructions ul {
+            padding-left: 20px;
+        }
+        
+        .instructions li {
+            margin-bottom: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .buttons {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+            
+            .result-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .result-actions {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-users"></i> Pembagian Kelompok Otomatis</h1>
+            <p class="description">Alat untuk membagi daftar nama secara acak dan merata ke dalam kelompok. Cukup masukkan nama, tentukan jumlah kelompok, dan sistem akan melakukan pembagian otomatis.</p>
+        </header>
+        
+        <div class="main-content">
+            <section class="input-section">
+                <div class="card">
+                    <h2 class="card-title"><i class="fas fa-edit"></i> Input Data</h2>
+                    
+                    <div class="instructions">
+                        <h3><i class="fas fa-info-circle"></i> Petunjuk</h3>
+                        <ul>
+                            <li>Masukkan daftar nama (satu nama per baris)</li>
+                            <li>Tentukan jumlah kelompok yang diinginkan</li>
+                            <li>Klik tombol "Bagi Kelompok" untuk memproses</li>
+                            <li>Gunakan tombol "Acak Ulang" untuk mengacak kembali</li>
+                        </ul>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="names"><i class="fas fa-user"></i> Daftar Nama (satu nama per baris):</label>
+                        <textarea id="names" placeholder="Contoh:
+Andi
+Budi
+Citra
+Dian
+Eka
+..."></textarea>
+                        <div class="counter">Jumlah nama: <span id="nameCount">0</span></div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="groupCount"><i class="fas fa-layer-group"></i> Jumlah Kelompok:</label>
+                        <select id="groupCount">
+                            <option value="2">2 Kelompok</option>
+                            <option value="3" selected>3 Kelompok</option>
+                            <option value="4">4 Kelompok</option>
+                            <option value="5">5 Kelompok</option>
+                            <option value="6">6 Kelompok</option>
+                            <option value="7">7 Kelompok</option>
+                            <option value="8">8 Kelompok</option>
+                        </select>
+                    </div>
+                    
+                    <div class="buttons">
+                        <button id="submitBtn" class="btn">
+                            <i class="fas fa-random"></i> Bagi Kelompok
+                        </button>
+                        <button id="exampleBtn" class="btn btn-success">
+                            <i class="fas fa-lightbulb"></i> Contoh Data
+                        </button>
+                        <button id="resetBtn" class="btn btn-danger">
+                            <i class="fas fa-redo"></i> Reset
+                        </button>
+                    </div>
+                    
+                    <div id="errorMessage" class="error-message">
+                        <i class="fas fa-exclamation-circle"></i> <span id="errorText"></span>
+                    </div>
+                </div>
+            </section>
+            
+            <section class="output-section">
+                <div class="card result-container" id="resultContainer">
+                    <div class="result-header">
+                        <h2 class="result-title"><i class="fas fa-users"></i> Hasil Pembagian Kelompok</h2>
+                        <div class="result-actions">
+                            <button id="reShuffleBtn" class="btn">
+                                <i class="fas fa-random"></i> Acak Ulang
+                            </button>
+                            <button id="copyBtn" class="btn btn-success">
+                                <i class="fas fa-copy"></i> Salin Hasil
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div id="groupsContainer" class="groups-container">
+                        <!-- Hasil kelompok akan ditampilkan di sini -->
+                    </div>
+                </div>
+                
+                <div class="card empty-state" id="emptyState">
+                    <i class="fas fa-users"></i>
+                    <h3>Belum Ada Hasil</h3>
+                    <p>Masukkan daftar nama dan klik "Bagi Kelompok" untuk melihat hasil pembagian.</p>
+                </div>
+            </section>
+        </div>
+        
+ <footer>
+    <p>Dikembangkan oleh <strong> ZimeCreatif.</strong>. Alat ini membantu guru dalam membagi kelompok siswa secara adil dan efisien.</p>
+    <p>&copy; 2026 Pembagian Kelompok Otomatis. All rights reserved.</p>
+</footer>
+    </div>
+
+    <script>
+        // Elemen DOM
+        const namesTextarea = document.getElementById('names');
+        const groupCountSelect = document.getElementById('groupCount');
+        const nameCountSpan = document.getElementById('nameCount');
+        const submitBtn = document.getElementById('submitBtn');
+        const exampleBtn = document.getElementById('exampleBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const reShuffleBtn = document.getElementById('reShuffleBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const resultContainer = document.getElementById('resultContainer');
+        const emptyState = document.getElementById('emptyState');
+        const groupsContainer = document.getElementById('groupsContainer');
+        
+        // Data contoh
+        const exampleNames = [
+            "Ahmad Hidayat",
+            "Budi Santoso",
+            "Citra Lestari",
+            "Dian Permata",
+            "Eko Prasetyo",
+            "Fitriani Sari",
+            "Gilang Ramadhan",
+            "Hana Wijaya",
+            "Irfan Maulana",
+            "Jihan Aulia",
+            "Kevin Pratama",
+            "Lestari Ningrum",
+            "Maya Indah",
+            "Nanda Putra",
+            "Oki Setiawan",
+            "Putri Anggraini",
+            "Rizki Fauzi",
+            "Sari Dewi",
+            "Taufik Hidayat",
+            "Umi Kulsum",
+            "Vina Oktaviani",
+            "Wahyu Nugroho",
+            "Yunita Sari",
+            "Zainal Abidin"
+        ];
+        
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Update jumlah nama saat halaman dimuat
+            updateNameCount();
+            
+            // Contoh data
+            exampleBtn.addEventListener('click', loadExampleData);
+            
+            // Reset data
+            resetBtn.addEventListener('click', resetData);
+            
+            // Submit pembagian kelompok
+            submitBtn.addEventListener('click', divideGroups);
+            
+            // Acak ulang
+            reShuffleBtn.addEventListener('click', reShuffleGroups);
+            
+            // Salin hasil
+            copyBtn.addEventListener('click', copyResultsToClipboard);
+            
+            // Update jumlah nama saat textarea berubah
+            namesTextarea.addEventListener('input', updateNameCount);
+        });
+        
+        // Fungsi untuk memperbarui jumlah nama
+        function updateNameCount() {
+            const names = getNamesArray();
+            nameCountSpan.textContent = names.length;
+        }
+        
+        // Fungsi untuk mendapatkan array nama dari textarea
+        function getNamesArray() {
+            const namesText = namesTextarea.value.trim();
+            if (!namesText) return [];
+            
+            return namesText.split('\n')
+                .map(name => name.trim())
+                .filter(name => name.length > 0);
+        }
+        
+        // Fungsi untuk memuat contoh data
+        function loadExampleData() {
+            namesTextarea.value = exampleNames.join('\n');
+            updateNameCount();
+            showSuccess("Contoh data telah dimuat. Klik 'Bagi Kelompok' untuk melihat hasil.");
+        }
+        
+        // Fungsi untuk mereset data
+        function resetData() {
+            namesTextarea.value = '';
+            updateNameCount();
+            hideResult();
+            showSuccess("Data telah direset.");
+        }
+        
+        // Fungsi untuk membagi kelompok
+        function divideGroups() {
+            const names = getNamesArray();
+            const groupCount = parseInt(groupCountSelect.value);
+            
+            // Validasi input
+            if (names.length === 0) {
+                showError("Masukkan minimal satu nama.");
+                return;
+            }
+            
+            if (groupCount > names.length) {
+                showError(`Jumlah kelompok (${groupCount}) tidak boleh lebih besar dari jumlah nama (${names.length}).`);
+                return;
+            }
+            
+            // Acak urutan nama
+            const shuffledNames = shuffleArray([...names]);
+            
+            // Bagi nama ke dalam kelompok
+            const groups = distributeNames(shuffledNames, groupCount);
+            
+            // Tampilkan hasil
+            displayGroups(groups);
+            hideError();
+            
+            // Simpan data untuk acak ulang
+            saveCurrentData(names, groupCount);
+        }
+        
+        // Fungsi untuk mengacak array (Fisher-Yates shuffle)
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+        
+        // Fungsi untuk mendistribusikan nama ke dalam kelompok
+        function distributeNames(names, groupCount) {
+            const groups = Array.from({ length: groupCount }, () => []);
+            
+            for (let i = 0; i < names.length; i++) {
+                const groupIndex = i % groupCount;
+                groups[groupIndex].push(names[i]);
+            }
+            
+            return groups;
+        }
+        
+        // Fungsi untuk menampilkan kelompok
+        function displayGroups(groups) {
+            groupsContainer.innerHTML = '';
+            
+            groups.forEach((group, index) => {
+                const groupCard = document.createElement('div');
+                groupCard.className = 'group-card';
+                
+                let groupHTML = `
+                    <h3 class="group-title">
+                        <i class="fas fa-users"></i> Kelompok ${index + 1} 
+                        <span style="font-size: 0.9rem; color: #666; font-weight: normal;">(${group.length} anggota)</span>
+                    </h3>
+                    <ul class="member-list">
+                `;
+                
+                group.forEach((member, memberIndex) => {
+                    groupHTML += `
+                        <li>
+                            <span class="member-number">${memberIndex + 1}</span>
+                            <span class="member-name">${member}</span>
+                        </li>
+                    `;
+                });
+                
+                groupHTML += `</ul>`;
+                groupCard.innerHTML = groupHTML;
+                groupsContainer.appendChild(groupCard);
+            });
+            
+            // Tampilkan hasil dan sembunyikan empty state
+            resultContainer.style.display = 'block';
+            emptyState.style.display = 'none';
+        }
+        
+        // Fungsi untuk menyimpan data saat ini untuk acak ulang
+        function saveCurrentData(names, groupCount) {
+     
