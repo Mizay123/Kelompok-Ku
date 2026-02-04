@@ -610,4 +610,120 @@ Eka
         
         // Fungsi untuk menyimpan data saat ini untuk acak ulang
         function saveCurrentData(names, groupCount) {
-     
+            // Simpan dalam atribut data
+            resultContainer.dataset.names = JSON.stringify(names);
+            resultContainer.dataset.groupCount = groupCount;
+        }
+        
+        // Fungsi untuk acak ulang kelompok
+        function reShuffleGroups() {
+            const savedNames = resultContainer.dataset.names;
+            const savedGroupCount = resultContainer.dataset.groupCount;
+            
+            if (!savedNames) {
+                showError("Tidak ada data untuk diacak ulang. Silakan bagi kelompok terlebih dahulu.");
+                return;
+            }
+            
+            const names = JSON.parse(savedNames);
+            const groupCount = parseInt(savedGroupCount);
+            
+            // Acak ulang urutan nama
+            const shuffledNames = shuffleArray([...names]);
+            
+            // Bagi nama ke dalam kelompok
+            const groups = distributeNames(shuffledNames, groupCount);
+            
+            // Tampilkan hasil
+            displayGroups(groups);
+            showSuccess("Kelompok telah diacak ulang.");
+        }
+        
+        // Fungsi untuk menyalin hasil ke clipboard
+        async function copyResultsToClipboard() {
+            const groups = document.querySelectorAll('.group-card');
+            if (groups.length === 0) {
+                showError("Tidak ada hasil untuk disalin.");
+                return;
+            }
+            
+            let resultText = `HASIL PEMBAGIAN KELOMPOK\n`;
+            resultText += `Dibuat pada: ${new Date().toLocaleDateString('id-ID', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}\n\n`;
+            
+            groups.forEach((group, index) => {
+                const groupTitle = group.querySelector('.group-title').textContent;
+                const members = group.querySelectorAll('.member-name');
+                
+                resultText += `${groupTitle}\n`;
+                members.forEach((member, memberIndex) => {
+                    resultText += `${memberIndex + 1}. ${member.textContent}\n`;
+                });
+                resultText += '\n';
+            });
+            
+            try {
+                await navigator.clipboard.writeText(resultText);
+                showSuccess("Hasil telah disalin ke clipboard!");
+                
+                // Tampilkan konfirmasi visual
+                const originalText = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<i class="fas fa-check"></i> Tersalin!';
+                copyBtn.style.backgroundColor = '#4CAF50';
+                
+                setTimeout(() => {
+                    copyBtn.innerHTML = originalText;
+                    copyBtn.style.backgroundColor = '';
+                }, 2000);
+            } catch (err) {
+                console.error('Gagal menyalin ke clipboard: ', err);
+                showError("Gagal menyalin ke clipboard. Silakan salin secara manual.");
+            }
+        }
+        
+        // Fungsi untuk menampilkan pesan error
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.style.display = 'block';
+            
+            // Sembunyikan setelah 5 detik
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+            }, 5000);
+        }
+        
+        // Fungsi untuk menampilkan pesan sukses (menggunakan errorMessage dengan style berbeda)
+        function showSuccess(message) {
+            errorText.textContent = message;
+            errorMessage.style.backgroundColor = '#d4edda';
+            errorMessage.style.color = '#155724';
+            errorMessage.style.border = '1px solid #c3e6cb';
+            errorMessage.style.display = 'block';
+            
+            // Sembunyikan setelah 3 detik
+            setTimeout(() => {
+                errorMessage.style.display = 'none';
+                errorMessage.style.backgroundColor = '#ffccd5';
+                errorMessage.style.color = '#e63946';
+                errorMessage.style.border = 'none';
+            }, 3000);
+        }
+        
+        // Fungsi untuk menyembunyikan pesan error
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+        
+        // Fungsi untuk menyembunyikan hasil
+        function hideResult() {
+            resultContainer.style.display = 'none';
+            emptyState.style.display = 'block';
+        }
+        
+        // Inisialisasi dengan contoh data (opsional)
+        window.onload = function() {
+            // Uncomment baris di bawah untuk langsung memuat contoh data saat halaman dimuat
+            // loadExampleData();
+        };
+    </script>
+</body>
+</html>
